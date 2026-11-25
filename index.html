@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>바둑 배움터</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>바둑 배움터 <span>초보자를 위한 바둑 — 형세분석 · 추천수 · 잡히는 수순 설명</span></h1>
+  </header>
+
+  <main class="layout">
+    <section class="board-col">
+      <div class="board-frame">
+        <canvas id="board" aria-label="바둑판"></canvas>
+      </div>
+
+      <div id="demoBar" class="demo-bar" hidden>
+        <div class="demo-head">
+          <strong id="demoTitle"></strong>
+          <button class="icon-btn" data-act="demo-close" title="닫기 (Esc)">✕</button>
+        </div>
+        <p id="demoNote" class="demo-note"></p>
+        <div class="demo-ctrl">
+          <button data-act="demo-first" title="처음">⏮</button>
+          <button data-act="demo-prev" title="이전 (←)">◀</button>
+          <span id="demoStep" class="demo-step"></span>
+          <button data-act="demo-next" title="다음 (→)">▶</button>
+          <button data-act="demo-play" id="demoPlayBtn" title="자동 재생">⏵ 자동</button>
+        </div>
+      </div>
+
+      <div class="game-btns">
+        <button data-act="pass">패스</button>
+        <button data-act="undo">무르기</button>
+        <button data-act="new" class="primary">새 게임</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="card status" id="statusCard"></div>
+
+      <div class="card" id="evalCard"></div>
+
+      <div class="card" id="situationCard"></div>
+
+      <div class="card" id="infoCard"></div>
+
+      <div class="card" id="recCard"></div>
+
+      <div class="card toggles">
+        <h3>보조 기능</h3>
+        <label><input type="checkbox" data-opt="eval"> 형세(집) 표시</label>
+        <label><input type="checkbox" data-opt="rec"> 추천 수 표시</label>
+        <label><input type="checkbox" data-opt="danger"> 위험한 자리 ✕ 표시</label>
+        <label><input type="checkbox" data-opt="confirm"> 두 번 눌러서 두기 <small>(한 번 누르면 미리 분석)</small></label>
+      </div>
+
+      <details class="card settings" id="settingsCard">
+        <summary>새 게임 설정</summary>
+        <div class="form">
+          <label>판 크기
+            <select id="setSize">
+              <option value="9">9줄 (입문 추천)</option>
+              <option value="13">13줄</option>
+              <option value="19">19줄 (정식)</option>
+            </select>
+          </label>
+          <label>상대
+            <select id="setMode">
+              <option value="ai">컴퓨터와 대국</option>
+              <option value="2p">두 사람이 번갈아 (연습)</option>
+            </select>
+          </label>
+          <label>내 돌
+            <select id="setColor">
+              <option value="1">흑 (먼저 둠)</option>
+              <option value="2">백</option>
+            </select>
+          </label>
+          <label>컴퓨터 실력
+            <select id="setLevel">
+              <option value="1">쉬움</option>
+              <option value="2">보통</option>
+              <option value="3">어려움</option>
+            </select>
+          </label>
+          <label>덤 (백에게 주는 집)
+            <select id="setKomi">
+              <option value="0.5">0.5</option>
+              <option value="6.5">6.5</option>
+              <option value="7.5">7.5</option>
+            </select>
+          </label>
+          <button data-act="start" class="primary">이 설정으로 시작</button>
+        </div>
+      </details>
+
+      <details class="card help">
+        <summary>바둑 기초 규칙 한눈에 보기</summary>
+        <dl>
+          <dt>활로</dt><dd>돌과 상하좌우로 맞닿은 빈 자리. 돌이 숨 쉬는 곳이에요. 같은 색 돌이 붙어 있으면 활로를 함께 써요.</dd>
+          <dt>단수</dt><dd>활로가 1개만 남은 상태. 상대가 그 자리에 두면 돌이 따내져요.</dd>
+          <dt>따내기</dt><dd>상대 돌의 활로를 모두 막으면 그 돌을 판에서 들어내요. 따낸 돌은 1개당 1집이에요.</dd>
+          <dt>자살수 금지</dt><dd>놓자마자 활로가 0이 되는 자리에는 둘 수 없어요. 단, 그 수로 상대 돌을 따낸다면 둘 수 있어요.</dd>
+          <dt>패</dt><dd>돌 하나를 서로 계속 따낼 수 있는 모양. 따내진 쪽은 바로 되따낼 수 없고, 다른 곳에 한 수 둔 뒤에 따낼 수 있어요.</dd>
+          <dt>축 (사다리)</dt><dd>단수를 계속 쳐서 지그재그로 몰아가며 잡는 방법. 도망가는 길 끝에 내 편 돌(축머리)이 있으면 축이 성립하지 않아요.</dd>
+          <dt>장문 (그물)</dt><dd>바로 단수를 치지 않고, 한 칸 떨어진 곳에 씌워서 도망칠 길을 막는 방법.</dd>
+          <dt>집과 계가</dt><dd>내 돌로 완전히 둘러싼 빈 자리가 내 집이에요. 두 사람이 연속으로 패스하면 대국이 끝나고, <b>집 + 따낸 돌</b>이 많은 쪽이 이겨요. 백은 나중에 두므로 덤을 받아요.</dd>
+        </dl>
+      </details>
+    </aside>
+  </main>
+
+  <script src="js/board.js"></script>
+  <script src="js/tactics.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/advisor.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
