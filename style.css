@@ -142,6 +142,18 @@ button:disabled { opacity: .5; cursor: default; }
 
 @media (max-width: 720px) {
   body { padding: 0 12px 24px; }
+  .top { padding: 12px 0 8px; }
   .top h1 { font-size: 19px; }
-  .panel { max-width: none; }
+  /* 핸드폰: 패널 카드를 판 위아래로 재배치해서 탭하면 설명이 바로 보이게 */
+  .layout { flex-direction: column; align-items: stretch; gap: 10px; }
+  .panel { display: contents; }
+  .board-col { flex: none; max-width: none; order: 1; }
+  #statusCard { order: 0; }
+  #situationCard { order: 2; }
+  #infoCard { order: 3; }
+  #evalCard { order: 4; }
+  #recCard { order: 5; }
+  .toggles, .settings, .help { order: 6; }
+  .board-frame { padding: 4px; }
+  .game-btns button { flex: 1; }
 }
